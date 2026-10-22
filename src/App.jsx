@@ -4,20 +4,26 @@ import { collection, getDocs, doc, getDoc, addDoc, serverTimestamp } from 'fireb
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdminDashboard from './admin/AdminDashboard';
-import { ArrowRight, Mail, GraduationCap, Building2, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Mail, GraduationCap, BookOpen, Users, CheckCircle2, MapPin, ExternalLink, Sparkles, Briefcase, Globe } from 'lucide-react';
+
+import defaultProfileImg from './assets/SalwaF.jpeg';
+import logoUnsil from './assets/LOGO-UNSIL.png';
+import logoSman5 from './assets/Campus5.png';
 
 export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [educations, setEducations] = useState([]);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  
   const [profile, setProfile] = useState({
     name: 'Salwa Fauziah',
-    title: 'Management Student & Future Business Leader',
+    title: 'Management Student',
     university: 'UNIVERSITAS SILIWANGI · S1 MANAJEMEN',
-    bio: 'Mengintegrasikan presisi analitis dan tata kelola bisnis modern. Berfokus pada Manajemen Strategis, Analisis Bisnis, dan pengembangan profesional berbasis di Tasikmalaya, Jawa Barat.',
-    gpa: '3.88+',
+    bio: 'Mahasiswa aktif Program Studi Manajemen Fakultas Ekonomi dan Bisnis Universitas Siliwangi. Berfokus membangun fondasi kuat dalam ilmu manajemen, organisasi, dan analisis bisnis.',
+    gpa: 'Aktif S1',
     location: 'Tasikmalaya, Jawa Barat',
-    profileImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-Z9BPMjQydtqQ8MIteqDfc9Sd7LuiZW6AyzDEqMFnXDDfaAN-RxTb9P9VCU9h6tlvR_apV0-dlkix-uyQ4hLXWx-aqSewVzRXqnlK7bWme5Cwy_rz81eYTA4qLqm2BLH4dpJOsURzVDJxajMhk5aZyEvwzk7924EUvXYzuGGIlb0qgVxc-cxtm0vrmOBD57ijiEIJpMppeQ3EninRx5A6X6V5peD7cXN6b826rLXESCN-KgP49q6lgg'
+    profileImageUrl: defaultProfileImg
   });
   
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
@@ -36,21 +42,31 @@ export default function App() {
       try {
         const profDoc = await getDoc(doc(db, 'profile', 'main'));
         if (profDoc.exists()) {
-          setProfile(profDoc.data());
+          const data = profDoc.data();
+          setProfile({
+            name: data.name || 'Salwa Fauziah',
+            title: data.title || 'Management Student',
+            university: data.university || 'UNIVERSITAS SILIWANGI · S1 MANAJEMEN',
+            bio: data.bio || 'Mahasiswa aktif Program Studi Manajemen Fakultas Ekonomi dan Bisnis Universitas Siliwangi.',
+            gpa: data.gpa || 'Aktif S1',
+            location: data.location || 'Tasikmalaya, Jawa Barat',
+            profileImageUrl: (data.profileImageUrl && data.profileImageUrl.trim() !== '') ? data.profileImageUrl : defaultProfileImg
+          });
         }
-
         const projSnap = await getDocs(collection(db, 'projects'));
         setProjects(projSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-
         const eduSnap = await getDocs(collection(db, 'education'));
         setEducations(eduSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (err) {
         console.error("Gagal memuat data:", err);
+      } finally {
+        setLoadingProfile(false);
       }
     };
     fetchData();
   }, []);
 
+  // Fungsi simpan pesan kontak dipastikan menangkap data dengan benar
   const handleSubmitContact = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -79,10 +95,7 @@ export default function App() {
     return (
       <div>
         <div className="bg-[#071328] px-6 py-2 text-right">
-          <button 
-            onClick={() => { setIsAdminOpen(false); window.history.pushState({}, '', '/'); }}
-            className="text-xs text-blue-200 hover:text-white underline cursor-pointer"
-          >
+          <button onClick={() => { setIsAdminOpen(false); window.history.pushState({}, '', '/'); }} className="text-xs text-blue-200 hover:text-white underline cursor-pointer transition">
             ← Kembali ke Website Utama
           </button>
         </div>
@@ -92,66 +105,69 @@ export default function App() {
   }
 
   return (
-    <div className="bg-[#f8f9ff] text-[#0b1c30] font-sans min-h-screen flex flex-col justify-between selection:bg-[#00236f] selection:text-white">
-      
-      <Navbar onOpenAdmin={() => { setIsAdminOpen(true); window.history.pushState({}, '', '/admin'); }} />
+    <div className="bg-[#f4f7fc] text-[#0b1c30] font-sans min-h-screen flex flex-col justify-between selection:bg-[#00236f] selection:text-white scroll-smooth overflow-x-hidden">
+      <Navbar profileImage={profile.profileImageUrl} onOpenAdmin={() => { setIsAdminOpen(true); window.history.pushState({}, '', '/admin'); }} />
 
-      <main className="w-full pt-28 bg-[#f8f9ff] flex-grow max-w-[1200px] mx-auto px-6">
+      <main className="w-full pt-24 lg:pt-28 flex-grow max-w-[1200px] mx-auto px-4 sm:px-6">
         
-        {/* HERO SECTION */}
-        <section className="relative w-full rounded-2xl overflow-hidden bg-[#071328] text-white shadow-2xl mb-12 border border-white/10">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#071328] via-[#091f4d] to-[#00285e] opacity-95"></div>
+        {/* HERO SECTION - Responsif Mobile */}
+        <section className="relative w-full rounded-[2rem] lg:rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-[#071328] via-[#0b1c30] to-[#00285e] text-white shadow-2xl mb-16 lg:mb-20 border border-white/10 group">
+          <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#4b8cf6_1px,transparent_1px)] [background-size:24px_24px] group-hover:opacity-30 transition-opacity duration-700"></div>
+          <div className="absolute -top-32 -right-32 w-72 h-72 lg:w-96 lg:h-96 bg-blue-500/20 blur-[80px] lg:blur-[100px] rounded-full pointer-events-none"></div>
           
-          <div className="relative z-10 px-8 lg:px-16 py-12 lg:py-16 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="relative z-10 px-6 py-12 sm:p-12 lg:px-16 lg:py-24 flex flex-col-reverse lg:flex-row items-center justify-between gap-10 lg:gap-12">
             
-            <div className="w-full lg:w-7/12 flex flex-col items-start gap-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15">
-                <span className="w-2 h-2 rounded-full bg-blue-300"></span>
-                <span className="text-xs uppercase tracking-wider text-blue-100 font-semibold">{profile.university}</span>
+            <div className="w-full lg:w-7/12 flex flex-col items-center lg:items-start text-center lg:text-left gap-6 lg:gap-7">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-blue-200 text-[10px] sm:text-xs uppercase tracking-wider font-semibold shadow-inner">
+                <Sparkles size={14} className="text-blue-300 animate-pulse hidden sm:block" />
+                <span>{profile.university}</span>
               </div>
 
-              <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.15]">
                 {profile.name} <br />
-                <span className="bg-gradient-to-r from-blue-200 via-sky-100 to-white bg-clip-text text-transparent text-2xl lg:text-4xl">{profile.title}</span>
+                <span className="bg-gradient-to-r from-blue-200 via-blue-100 to-white bg-clip-text text-transparent text-xl sm:text-2xl lg:text-3xl font-semibold mt-2 lg:mt-3 block">{profile.title}</span>
               </h1>
               
-              <p className="text-lg text-blue-100/90 max-w-2xl leading-relaxed">
+              <p className="text-sm sm:text-base lg:text-lg text-slate-300/90 max-w-2xl leading-relaxed">
                 {profile.bio}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <a href="#proyek-riset" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-[#00236f] font-semibold shadow-lg hover:bg-blue-50 transition-all">
+              {/* Tombol responsif: stack di HP, sejajar di layar besar */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 pt-2 w-full lg:w-auto">
+                <a href="#proyek-riset" className="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-7 py-3.5 rounded-2xl bg-white text-[#00236f] font-bold text-sm shadow-xl hover:bg-blue-50 hover:-translate-y-1 transition-all duration-300">
                   <span>Lihat Portofolio</span>
                   <ArrowRight size={18} />
                 </a>
-                <a href="#kontak" className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 font-semibold transition-all">
+                <a href="#kontak" className="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-7 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 font-bold text-sm shadow-lg hover:-translate-y-1 transition-all duration-300">
                   <Mail size={18} />
                   <span>Hubungi Saya</span>
                 </a>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 w-full pt-4 mt-2 bg-white/[0.06] backdrop-blur-md rounded-xl p-4 border border-white/10">
-                <div>
-                  <span className="text-xs text-blue-200 block mb-1">Poin Akademik / IPK</span>
-                  <span className="text-xl font-bold text-white">{profile.gpa}</span>
+              {/* Kotak Info Responsif */}
+              <div className="grid grid-cols-2 gap-4 lg:gap-6 w-full pt-6 mt-2 border-t border-white/10 text-left">
+                <div className="bg-white/5 p-3 lg:p-0 lg:bg-transparent rounded-xl lg:rounded-none">
+                  <span className="text-[10px] lg:text-xs text-slate-400 block mb-1 uppercase tracking-wider font-semibold">Status Akademik</span>
+                  <span className="text-lg lg:text-xl font-bold text-white tracking-wide">{profile.gpa}</span>
                 </div>
-                <div className="border-l border-white/10 pl-4">
-                  <span className="text-xs text-blue-200 block mb-1">Domisili</span>
-                  <span className="text-xl font-bold text-white">{profile.location}</span>
+                <div className="bg-white/5 p-3 lg:p-0 lg:bg-transparent rounded-xl lg:rounded-none">
+                  <span className="text-[10px] lg:text-xs text-slate-400 block mb-1 uppercase tracking-wider font-semibold">Domisili</span>
+                  <span className="text-sm sm:text-lg lg:text-xl font-bold text-white flex items-center gap-1.5 lg:gap-2 tracking-wide"><MapPin size={16} className="text-blue-400 shrink-0"/> <span className="truncate">{profile.location}</span></span>
                 </div>
               </div>
             </div>
 
-            <div className="w-full lg:w-5/12 flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-sm">
-                <div className="absolute -inset-1 bg-gradient-to-r from-blue-400/40 to-indigo-500/40 rounded-2xl blur-xl opacity-80"></div>
-                <div className="relative bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/25 shadow-2xl">
-                  <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-[#1e3a8a] border border-white/20">
-                    <img src={profile.profileImageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuA-Z9BPMjQydtqQ8MIteqDfc9Sd7LuiZW6AyzDEqMFnXDDfaAN-RxTb9P9VCU9h6tlvR_apV0-dlkix-uyQ4hLXWx-aqSewVzRXqnlK7bWme5Cwy_rz81eYTA4qLqm2BLH4dpJOsURzVDJxajMhk5aZyEvwzk7924EUvXYzuGGIlb0qgVxc-cxtm0vrmOBD57ijiEIJpMppeQ3EninRx5A6X6V5peD7cXN6b826rLXESCN-KgP49q6lgg"} alt={profile.name} className="w-full h-full object-cover object-top" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <h3 className="text-lg font-bold">{profile.name}</h3>
-                      <p className="text-xs text-blue-200">{profile.university}</p>
+            {/* Foto Profil Responsif */}
+            <div className="w-4/5 sm:w-2/3 lg:w-5/12 flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-[280px] lg:max-w-sm group cursor-pointer">
+                <div className="absolute -inset-2 lg:-inset-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[2rem] lg:rounded-[2.5rem] blur-xl lg:blur-2xl opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
+                <div className="relative bg-slate-900/40 backdrop-blur-2xl p-3 lg:p-4 rounded-[2rem] lg:rounded-[2.5rem] border border-white/20 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
+                  <div className="relative w-full aspect-square rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden bg-slate-800">
+                    <img src={profile.profileImageUrl} alt={profile.name} className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#071328]/90 via-[#071328]/20 to-transparent"></div>
+                    <div className="absolute bottom-4 left-4 right-4 lg:bottom-6 lg:left-6 lg:right-6 text-white">
+                      <h3 className="text-lg lg:text-xl font-bold">{profile.name}</h3>
+                      <p className="text-[10px] lg:text-xs text-blue-200 mt-0.5 lg:mt-1 font-medium tracking-wide truncate">FEB Universitas Siliwangi</p>
                     </div>
                   </div>
                 </div>
@@ -162,54 +178,81 @@ export default function App() {
         </section>
 
         {/* ABOUT SECTION */}
-        <section id="tentang-saya" className="py-12 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs uppercase tracking-widest text-[#00236f] font-bold">PROFIL AKADEMIK & KOMPETENSI</span>
-              <h2 className="text-3xl font-bold text-[#0b1c30] mt-1">Dedikasi Manajemen Terstruktur</h2>
+        <section id="tentang-saya" className="py-12 lg:py-16 flex flex-col gap-8 lg:gap-10 scroll-mt-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 lg:gap-6">
+            <div className="space-y-1.5 lg:space-y-2 text-center md:text-left">
+              <span className="text-[10px] lg:text-xs uppercase tracking-widest text-[#00236f] font-extrabold flex items-center justify-center md:justify-start gap-2"><div className="w-4 lg:w-6 h-0.5 bg-[#00236f]"></div> FOKUS & EKSPLORASI</span>
+              <h2 className="text-3xl lg:text-4xl font-extrabold text-[#0b1c30] tracking-tight">Pengembangan Diri</h2>
             </div>
+            <p className="text-sm text-slate-600 max-w-md leading-relaxed text-center md:text-left">
+              Menjalani perkuliahan tingkat awal dengan semangat eksplorasi ilmu ekonomi, tata kelola organisasi, dan kolaborasi tim profesional.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <GraduationCap className="text-[#00236f] mb-4" size={32} />
-              <h3 className="text-lg font-bold text-[#0b1c30] mb-2">Pendidikan Unggul</h3>
-              <p className="text-sm text-[#444651]">Menempuh studi manajemen dengan komitmen tinggi pada prestasi dan pengembangan diri.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <Building2 className="text-[#00236f] mb-4" size={32} />
-              <h3 className="text-lg font-bold text-[#0b1c30] mb-2">Tata Kelola Bisnis</h3>
-              <p className="text-sm text-[#444651]">Mendalami prinsip manajemen strategis, operasional, dan perencanaan bisnis.</p>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
-              <TrendingUp className="text-[#00236f] mb-4" size={32} />
-              <h3 className="text-lg font-bold text-[#0b1c30] mb-2">Analitik & Kepemimpinan</h3>
-              <p className="text-sm text-[#444651]">Menguasai riset pasar, analisis finansial, serta komunikasi profesional.</p>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 lg:gap-6">
+            {[
+              { icon: GraduationCap, title: 'Studi Manajemen', desc: 'Mempelajari konsep dasar organisasi, pengantar bisnis, dan dinamika perusahaan di Fakultas Ekonomi dan Bisnis UNSIL.' },
+              { icon: BookOpen, title: 'Literasi & Riset Dasar', desc: 'Aktif mengikuti literatur bisnis, studi kasus sederhana, serta penulisan laporan akademik secara terstruktur.' },
+              { icon: Users, title: 'Kolaborasi Tim', desc: 'Mengasah kemampuan komunikasi, kerja sama tim, dan kepemimpinan melalui penugasan kelompok serta relasi kampus.' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white rounded-[1.5rem] lg:rounded-3xl p-6 lg:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100 hover:shadow-[0_8px_30px_rgba(0,35,111,0.08)] hover:-translate-y-1.5 transition-all duration-300 group text-center sm:text-left">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-blue-50/80 text-[#00236f] flex items-center justify-center mb-5 lg:mb-6 group-hover:bg-[#00236f] group-hover:text-white transition-colors duration-300 mx-auto sm:mx-0">
+                  <item.icon size={24} />
+                </div>
+                <h3 className="text-lg lg:text-xl font-extrabold text-[#0b1c30] mb-2.5 lg:mb-3">{item.title}</h3>
+                <p className="text-xs lg:text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* EDUCATION SECTION */}
-        <section id="pendidikan" className="py-12 flex flex-col gap-8">
-          <h2 className="text-3xl font-bold text-[#0b1c30]">Riwayat Pendidikan</h2>
-          {educations.length === 0 ? (
-            <div className="bg-white p-8 rounded-2xl text-center border border-dashed border-slate-300">
-              <p className="text-sm text-slate-500">Belum ada riwayat pendidikan yang ditambahkan dari halaman Admin.</p>
+        <section id="pendidikan" className="py-12 lg:py-16 flex flex-col gap-8 lg:gap-10 scroll-mt-24">
+          <div className="space-y-1.5 lg:space-y-2 text-center md:text-left">
+            <span className="text-[10px] lg:text-xs uppercase tracking-widest text-[#00236f] font-extrabold flex items-center justify-center md:justify-start gap-2"><div className="w-4 lg:w-6 h-0.5 bg-[#00236f]"></div> AKADEMIK</span>
+            <h2 className="text-3xl lg:text-4xl font-extrabold text-[#0b1c30] tracking-tight">Riwayat Pendidikan</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+            <div className="bg-white p-5 lg:p-8 rounded-[1.5rem] lg:rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-center sm:items-start gap-4 lg:gap-5 hover:shadow-md transition-shadow text-center sm:text-left">
+              <div className="w-16 h-16 lg:w-16 lg:h-16 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center p-2.5 shrink-0">
+                <img src={logoUnsil} alt="Logo UNSIL" className="w-full h-full object-contain" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="inline-block text-[9px] lg:text-[10px] font-extrabold text-blue-700 bg-blue-50/80 px-2.5 lg:px-3 py-1 lg:py-1.5 rounded-lg uppercase tracking-wider">2024 — Sekarang</span>
+                <h3 className="text-lg lg:text-xl font-extrabold text-[#0b1c30] tracking-tight">S1 Manajemen</h3>
+                <p className="text-xs lg:text-sm font-bold text-slate-700">Universitas Siliwangi (UNSIL)</p>
+                <p className="text-[11px] lg:text-xs text-slate-500 leading-relaxed">Fakultas Ekonomi dan Bisnis, Tasikmalaya.</p>
+              </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div className="bg-white p-5 lg:p-8 rounded-[1.5rem] lg:rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-center sm:items-start gap-4 lg:gap-5 hover:shadow-md transition-shadow text-center sm:text-left">
+              <div className="w-16 h-16 lg:w-16 lg:h-16 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center p-2.5 shrink-0">
+                <img src={logoSman5} alt="Logo SMAN 5" className="w-full h-full object-contain" />
+              </div>
+              <div className="space-y-1.5">
+                <span className="inline-block text-[9px] lg:text-[10px] font-extrabold text-slate-600 bg-slate-100 px-2.5 lg:px-3 py-1 lg:py-1.5 rounded-lg uppercase tracking-wider">2021 — 2024</span>
+                <h3 className="text-lg lg:text-xl font-extrabold text-[#0b1c30] tracking-tight">Sekolah Menengah Atas</h3>
+                <p className="text-xs lg:text-sm font-bold text-slate-700">SMA Negeri 5 Tasikmalaya</p>
+                <p className="text-[11px] lg:text-xs text-slate-500 leading-relaxed">Alumni terdaftar secara resmi.</p>
+              </div>
+            </div>
+          </div>
+
+          {educations.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 mt-2">
               {educations.map((edu) => (
-                <div key={edu.id} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
+                <div key={edu.id} className="bg-white p-5 lg:p-8 rounded-[1.5rem] lg:rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col sm:flex-row items-center sm:items-start gap-4 lg:gap-5 hover:shadow-md transition-shadow text-center sm:text-left">
                   {edu.logoUrl ? (
-                    <img src={edu.logoUrl} alt="Logo" className="w-12 h-12 object-contain rounded-xl bg-slate-50 border p-1.5 shrink-0" />
+                    <img src={edu.logoUrl} alt="Logo" className="w-16 h-16 object-contain rounded-2xl bg-white border border-slate-100 shadow-sm p-2 shrink-0" />
                   ) : (
-                    <div className="p-3 bg-[#00236f] text-white rounded-xl shrink-0"><GraduationCap size={24} /></div>
+                    <div className="w-16 h-16 bg-[#00236f] text-white rounded-2xl flex items-center justify-center shrink-0 shadow-sm"><GraduationCap size={24} /></div>
                   )}
-                  <div>
-                    <span className="text-xs font-semibold text-blue-600">{edu.period}</span>
-                    <h3 className="text-lg font-bold text-[#0b1c30]">{edu.degree}</h3>
-                    <p className="text-sm font-medium text-slate-700">{edu.institution}</p>
-                    {edu.description && <p className="text-xs text-slate-500 mt-1">{edu.description}</p>}
+                  <div className="space-y-1.5">
+                    <span className="inline-block text-[9px] lg:text-[10px] font-extrabold text-blue-700 bg-blue-50/80 px-2.5 lg:px-3 py-1 lg:py-1.5 rounded-lg uppercase tracking-wider">{edu.period}</span>
+                    <h3 className="text-lg lg:text-xl font-extrabold text-[#0b1c30] tracking-tight">{edu.degree}</h3>
+                    <p className="text-xs lg:text-sm font-bold text-slate-700">{edu.institution}</p>
+                    {edu.description && <p className="text-[11px] lg:text-xs text-slate-500 leading-relaxed">{edu.description}</p>}
                   </div>
                 </div>
               ))}
@@ -217,41 +260,47 @@ export default function App() {
           )}
         </section>
 
-        {/* PROJECTS / PORTFOLIO SECTION */}
-        <section id="proyek-riset" className="py-12 flex flex-col gap-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-              <span className="text-xs uppercase tracking-widest text-[#00236f] font-bold">PORTOFOLIO TERPILIH</span>
-              <h2 className="text-3xl font-bold text-[#0b1c30] mt-1">Tugas, Studi Kasus & Proyek Manajemen</h2>
+        {/* PROJECTS SECTION */}
+        <section id="proyek-riset" className="py-12 lg:py-16 flex flex-col gap-8 lg:gap-10 scroll-mt-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 lg:gap-6">
+            <div className="space-y-1.5 lg:space-y-2 text-center md:text-left">
+              <span className="text-[10px] lg:text-xs uppercase tracking-widest text-[#00236f] font-extrabold flex items-center justify-center md:justify-start gap-2"><div className="w-4 lg:w-6 h-0.5 bg-[#00236f]"></div> KARYA & TUGAS</span>
+              <h2 className="text-3xl lg:text-4xl font-extrabold text-[#0b1c30] tracking-tight">Portofolio Akademik</h2>
             </div>
-            <div className="flex gap-2 flex-wrap">
-              <button onClick={() => setActiveTab('all')} className={`px-4 py-2 rounded-full text-xs font-semibold transition cursor-pointer ${activeTab === 'all' ? 'bg-[#00236f] text-white' : 'bg-white text-slate-600 border'}`}>Semua</button>
-              <button onClick={() => setActiveTab('strategic')} className={`px-4 py-2 rounded-full text-xs font-semibold transition cursor-pointer ${activeTab === 'strategic' ? 'bg-[#00236f] text-white' : 'bg-white text-slate-600 border'}`}>Strategik</button>
-              <button onClick={() => setActiveTab('financial')} className={`px-4 py-2 rounded-full text-xs font-semibold transition cursor-pointer ${activeTab === 'financial' ? 'bg-[#00236f] text-white' : 'bg-white text-slate-600 border'}`}>Finansial</button>
+            {/* Filter Buttons */}
+            <div className="flex gap-2 flex-wrap justify-center p-1.5 bg-white rounded-xl lg:rounded-2xl shadow-sm border border-slate-100">
+              {['all', 'strategic', 'financial'].map(tab => (
+                <button key={tab} onClick={() => setActiveTab(tab)} className={`px-4 lg:px-5 py-2 lg:py-2.5 rounded-lg lg:rounded-xl text-[10px] lg:text-xs font-extrabold transition-all duration-300 cursor-pointer flex-1 sm:flex-none ${activeTab === tab ? 'bg-[#00236f] text-white shadow-md' : 'bg-transparent text-slate-500 hover:bg-slate-50 hover:text-[#0b1c30]'}`}>
+                  {tab === 'all' ? 'Semua' : tab === 'strategic' ? 'Manajemen' : 'Analisis'}
+                </button>
+              ))}
             </div>
           </div>
 
           {projects.length === 0 ? (
-            <div className="bg-white p-12 text-center rounded-2xl border border-dashed border-slate-300">
-              <p className="text-sm text-slate-500">Belum ada portofolio. Silakan buka menu <b>Admin</b> di pojok kanan atas untuk menambahkannya.</p>
+            <div className="bg-white p-10 lg:p-14 text-center rounded-[2rem] border-2 border-dashed border-slate-200 shadow-sm mx-2">
+              <div className="w-14 h-14 lg:w-16 lg:h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400"><BookOpen size={24}/></div>
+              <h3 className="text-base lg:text-lg font-bold text-[#0b1c30] mb-1">Belum Ada Portofolio</h3>
+              <p className="text-xs lg:text-sm text-slate-500 max-w-md mx-auto">Karya akademik dan tugas akan ditampilkan di sini. Akses panel Admin untuk mengunggah studi kasus baru.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
               {filteredProjects.map((project) => (
-                <div key={project.id} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div key={project.id} className="bg-white rounded-[2rem] p-4 sm:p-5 lg:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col justify-between hover:shadow-[0_12px_40px_rgba(0,35,111,0.08)] hover:-translate-y-2 transition-all duration-300 group">
                   <div>
                     {project.imageUrl && (
-                      <div className="w-full h-40 bg-slate-100 rounded-xl mb-4 overflow-hidden">
-                        <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover" />
+                      <div className="w-full h-48 sm:h-52 lg:h-56 bg-slate-100 rounded-[1.5rem] mb-5 overflow-hidden border border-slate-100 relative">
+                        <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                        <div className="absolute inset-0 bg-[#00236f]/0 group-hover:bg-[#00236f]/10 transition-colors duration-300"></div>
                       </div>
                     )}
-                    <span className="text-xs font-bold text-[#00236f] uppercase tracking-wider">{project.category}</span>
-                    <h3 className="text-xl font-bold text-[#0b1c30] mt-1 mb-2">{project.title}</h3>
-                    <p className="text-sm text-[#444651] mb-4">{project.description}</p>
+                    <span className="text-[9px] lg:text-[10px] font-extrabold text-[#00236f] uppercase tracking-widest bg-blue-50 px-3 py-1.5 rounded-lg">{project.category}</span>
+                    <h3 className="text-xl lg:text-2xl font-extrabold text-[#0b1c30] mt-3 lg:mt-4 mb-2 lg:mb-3 leading-tight group-hover:text-[#00236f] transition-colors">{project.title}</h3>
+                    <p className="text-xs lg:text-sm text-slate-600 mb-5 lg:mb-6 leading-relaxed line-clamp-3 lg:line-clamp-none">{project.description}</p>
                   </div>
                   {project.link && (
-                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#00236f] hover:underline flex items-center gap-1">
-                      Lihat Detail <ArrowRight size={14} />
+                    <a href={project.link} target="_blank" rel="noopener noreferrer" className="inline-flex w-full sm:w-fit justify-center sm:justify-start items-center gap-2 px-5 py-3 bg-slate-50 hover:bg-[#00236f] text-slate-700 hover:text-white rounded-xl text-xs font-bold transition-all duration-300">
+                      <span>Lihat Detail Studi</span> <ExternalLink size={14} />
                     </a>
                   )}
                 </div>
@@ -260,50 +309,77 @@ export default function App() {
           )}
         </section>
 
-        {/* CONTACT SECTION */}
-        <section id="kontak" className="py-12 flex flex-col gap-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-5 flex flex-col gap-4">
-              <span className="text-xs uppercase tracking-widest text-[#00236f] font-bold">HUBUNGI SAYA</span>
-              <h2 className="text-3xl font-bold text-[#0b1c30]">Mulai Diskusi & Kolaborasi</h2>
-              <p className="text-sm text-[#444651]">Terbuka untuk peluang profesional, tugas kolaborasi, maupun diskusi akademik.</p>
+        {/* CONTACT SECTION (Dengan Link IG & LinkedIn) */}
+        <section id="kontak" className="py-12 lg:py-16 flex flex-col gap-8 lg:gap-10 scroll-mt-24">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+            
+            {/* Bagian Kiri: Info & Sosial Media */}
+            <div className="lg:col-span-5 flex flex-col gap-6 text-center lg:text-left">
+              <div className="space-y-1.5 lg:space-y-2">
+                <span className="text-[10px] lg:text-xs uppercase tracking-widest text-[#00236f] font-extrabold flex items-center justify-center lg:justify-start gap-2"><div className="w-4 lg:w-6 h-0.5 bg-[#00236f]"></div> HUBUNGI SAYA</span>
+                <h2 className="text-3xl lg:text-4xl font-extrabold text-[#0b1c30] tracking-tight leading-tight">Mulai Diskusi & Kolaborasi</h2>
+              </div>
+              <p className="text-xs lg:text-sm text-slate-600 leading-relaxed max-w-sm mx-auto lg:mx-0">
+                Terbuka untuk diskusi tugas akademik, kerja sama tim, maupun peluang relasi profesional. Hubungi saya melalui email atau terhubung di platform profesional.
+              </p>
               
-              <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 text-[#00236f] flex items-center justify-center font-bold">@</div>
-                <div>
-                  <span className="text-xs text-slate-500 block">Email Institusi Resmi</span>
-                  <span className="text-sm font-bold text-[#0b1c30]">salwafauziah@unsil.ac.id</span>
+              <div className="bg-white p-5 lg:p-6 rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex flex-col gap-5 mt-2 lg:mt-4 mx-auto lg:mx-0 w-full max-w-sm lg:max-w-full text-left">
+                {/* Email Info */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-2xl bg-blue-50/80 text-[#00236f] flex items-center justify-center shadow-inner shrink-0">
+                    <Mail size={22} className="lg:w-6 lg:h-6" />
+                  </div>
+                  <div className="overflow-hidden">
+                    <span className="text-[10px] lg:text-[11px] font-bold text-slate-400 block uppercase tracking-wider mb-0.5">Email Pribadi</span>
+                    <span className="text-sm lg:text-base font-extrabold text-[#0b1c30] truncate block">salwasehhun@gmail.com</span>
+                  </div>
+                </div>
+
+                <div className="h-px w-full bg-slate-100"></div>
+
+                {/* Social Media Links (Dipindah ke sini) */}
+                <div className="flex items-center gap-3">
+                  <a href="https://www.linkedin.com/in/salwa-fauziah-835842433" target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-[#0a66c2]/10 hover:bg-[#0a66c2] text-[#0a66c2] hover:text-white text-xs font-bold transition-all duration-300">
+                    <Briefcase size={16} /> <span>LinkedIn</span>
+                  </a>
+                  <a href="https://instagram.com/slwfzh" target="_blank" rel="noopener noreferrer" className="flex-1 inline-flex justify-center items-center gap-2 px-4 py-3 rounded-xl bg-[#e1306c]/10 hover:bg-[#e1306c] text-[#e1306c] hover:text-white text-xs font-bold transition-all duration-300">
+                    <Globe size={16} /> <span>Instagram</span>
+                  </a>
                 </div>
               </div>
             </div>
 
-            <div className="lg:col-span-7 bg-[#0b162c] text-white p-8 rounded-2xl shadow-xl border border-white/10">
+            {/* Bagian Kanan: Form */}
+            <div className="lg:col-span-7 bg-gradient-to-br from-[#071328] to-[#0b1c30] text-white p-6 sm:p-8 md:p-12 rounded-[2rem] lg:rounded-[2.5rem] shadow-2xl border border-slate-800 relative overflow-hidden mt-4 lg:mt-0">
+              <div className="absolute top-0 right-0 w-48 h-48 lg:w-64 lg:h-64 bg-blue-500/10 blur-[60px] lg:blur-[80px] rounded-full pointer-events-none"></div>
+              
               {success && (
-                <div className="mb-4 bg-emerald-600/90 text-white p-3 rounded-xl text-sm flex items-center gap-2">
-                  <CheckCircle2 size={18} /> Pesan berhasil dikirim ke Salwa!
+                <div className="mb-6 lg:mb-8 bg-emerald-500/20 border border-emerald-500/30 text-emerald-200 p-4 rounded-xl lg:rounded-2xl text-xs lg:text-sm font-semibold flex items-center gap-3 animate-fade-in backdrop-blur-sm">
+                  <CheckCircle2 size={18} className="text-emerald-400 shrink-0" /> <span className="leading-tight">Pesan berhasil dikirim! Salwa akan segera merespons.</span>
                 </div>
               )}
-              <form onSubmit={handleSubmitContact} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-blue-200 uppercase mb-1 block">Nama Lengkap</label>
-                    <input type="text" required value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm" />
+              
+              <form onSubmit={handleSubmitContact} className="space-y-4 lg:space-y-5 relative z-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-5">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] lg:text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">Nama Lengkap</label>
+                    <input type="text" required value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full px-4 lg:px-5 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl bg-white/5 border border-white/10 text-white text-xs lg:text-sm focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all shadow-inner placeholder:text-slate-500" placeholder="Ketik nama Anda" />
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-blue-200 uppercase mb-1 block">Email</label>
-                    <input type="email" required value={formData.email} onChange={e=>setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm" />
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] lg:text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">Email</label>
+                    <input type="email" required value={formData.email} onChange={e=>setFormData({...formData, email: e.target.value})} className="w-full px-4 lg:px-5 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl bg-white/5 border border-white/10 text-white text-xs lg:text-sm focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all shadow-inner placeholder:text-slate-500" placeholder="Ketik email anda" />
                   </div>
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-blue-200 uppercase mb-1 block">Subjek</label>
-                  <input type="text" required value={formData.subject} onChange={e=>setFormData({...formData, subject: e.target.value})} className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm" />
+                <div className="space-y-1.5">
+                  <label className="text-[10px] lg:text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">Subjek</label>
+                  <input type="text" required value={formData.subject} onChange={e=>setFormData({...formData, subject: e.target.value})} className="w-full px-4 lg:px-5 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl bg-white/5 border border-white/10 text-white text-xs lg:text-sm focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all shadow-inner placeholder:text-slate-500" placeholder="Topik diskusi atau pesan" />
                 </div>
-                <div>
-                  <label className="text-xs font-semibold text-blue-200 uppercase mb-1 block">Pesan</label>
-                  <textarea rows="4" required value={formData.message} onChange={e=>setFormData({...formData, message: e.target.value})} className="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-white/15 text-white text-sm"></textarea>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] lg:text-xs font-bold text-slate-300 uppercase tracking-wider ml-1">Pesan</label>
+                  <textarea rows="4" required value={formData.message} onChange={e=>setFormData({...formData, message: e.target.value})} className="w-full px-4 lg:px-5 py-3.5 lg:py-4 rounded-xl lg:rounded-2xl bg-white/5 border border-white/10 text-white text-xs lg:text-sm focus:outline-none focus:border-blue-400 focus:bg-white/10 transition-all shadow-inner resize-none placeholder:text-slate-500" placeholder="Tuliskan pesan Anda secara detail..."></textarea>
                 </div>
-                <button type="submit" disabled={submitting} className="w-full py-3 rounded-xl bg-white text-[#00236f] font-bold text-sm hover:bg-blue-50 transition shadow-lg cursor-pointer">
-                  {submitting ? 'Mengirim...' : 'Kirim Pesan Resmi'}
+                <button type="submit" disabled={submitting} className="w-full py-3.5 lg:py-4 mt-2 rounded-xl lg:rounded-2xl bg-white text-[#00236f] font-extrabold text-xs lg:text-sm hover:bg-blue-50 hover:-translate-y-1 transition-all duration-300 shadow-xl cursor-pointer">
+                  {submitting ? 'Memproses Pengiriman...' : 'Kirim Pesan Sekarang'}
                 </button>
               </form>
             </div>
@@ -313,7 +389,6 @@ export default function App() {
       </main>
 
       <Footer />
-
     </div>
   );
 }
