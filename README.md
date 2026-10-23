@@ -1,20 +1,33 @@
-<<<<<<< HEAD
-# React + Vite
+# 🎓 Salwa Fauziah - Professional & Academic Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website portofolio pribadi dan profesional yang dibangun khusus untuk mahasiswa Program Studi Manajemen, Fakultas Ekonomi dan Bisnis, Universitas Siliwangi (UNSIL). Dilengkapi dengan panel *Admin Dashboard* terintegrasi Firebase untuk manajemen konten secara *real-time*.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🛠️ Tech Stack & Tools
 
-## React Compiler
+Proyek ini dibangun menggunakan teknologi web modern:
+* **Frontend:** React.js, Vite, Tailwind CSS (Styling & Desain Responsif)
+* **Icons:** Lucide React
+* **Backend & Database:** Firebase (Authentication, Firestore Database, & Firebase Storage)
+* **Deployment:** Vercel / GitHub Pages
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ✨ Fitur Utama
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# salwafauziah-portofolio
->>>>>>> b6ad76118cff511a7f8dec9acc5103f7f6c73981
+* **Responsive Design:** Dioptimalkan secara penuh untuk berbagai ukuran layar, mulai dari perangkat *mobile* (smartphone) hingga layar desktop besar.
+* **Dynamic Content Management (Admin Dashboard):** Panel khusus untuk memperbarui profil utama, riwayat pendidikan, serta portofolio studi kasus tanpa perlu mengubah kodingan.
+* **Firestore Integration:** Penyimpanan data berbasis cloud yang aman dan sinkron secara instan dengan halaman utama.
+* **Interactive Contact Form:** Formulir pesan resmi yang terhubung langsung ke database Firestore untuk menerima pesan dan kolaborasi.
+* **Aset Lokal Terintegrasi:** Dukungan penuh untuk aset visual pribadi dan logo institusi (Universitas Siliwangi & SMAN 5 Tasikmalaya).
+
+---
+
+## 🚀 Cara Menjalankan Proyek Secara Lokal
+
+Jika kamu ingin menjalankan atau mengembangkan kode ini di komputer lokal, ikuti langkah-langkah berikut:
+
+1. **Clone repository ini:**
+   ```bash
+   git clone [https://github.com/Rayival/salwafauziah-portofolio.git](https://github.com/Rayival/salwafauziah-portofolio.git)
